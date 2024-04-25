@@ -49,7 +49,7 @@ export const KeyboardAvoidingScrollView: React.FC<
   const topToContainer = useRef<number>(0)
   const bottomToWindow = useRef<number>(0)
   const lock = useRef<boolean>(false)
-  const measureTasks = useRef<Promise<void>>()
+  const measureTasks = useRef<Promise<void> | undefined>(undefined)
   const bottomAnimRef = useRef(new Animated.Value(0))
 
   const handleFocusElem = useCallback((elem: any) => {
@@ -91,7 +91,7 @@ export const KeyboardAvoidingScrollView: React.FC<
         duration: 0,
         useNativeDriver: false,
       }).start()
-      measureTasks.current.then(() => {
+      measureTasks.current?.then(() => {
         macroTask(() => {
           scrollViewRef.current?.scrollTo({
             y: scrollPosY.current - (bottomToWindow.current - keyboardHeight),
@@ -109,7 +109,7 @@ export const KeyboardAvoidingScrollView: React.FC<
     })
     return () => {
       lock.current = false
-      measureTasks.current = []
+      measureTasks.current = undefined
       Keyboard.removeAllListeners(showEvent)
       Keyboard.removeAllListeners(hideEvent)
     }
