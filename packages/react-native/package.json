@@ -1,5 +1,5 @@
 {
-  "name": "core",
+  "name": "@hong97/collections-react-native",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
@@ -10,6 +10,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@hong97/collections-utils": "workspace:*"
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"

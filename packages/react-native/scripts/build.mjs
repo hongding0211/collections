@@ -1,7 +1,6 @@
 import * as esbuild from 'esbuild'
 import babel from 'esbuild-plugin-babel';
 import { nodeExternalsPlugin } from 'esbuild-node-externals'
-import { dtsPlugin } from "esbuild-plugin-d.ts"
 
 await esbuild.build({
   entryPoints: ['src/index.ts'],
@@ -9,6 +8,6 @@ await esbuild.build({
   outdir: 'dist',
   format: 'esm',
   drop: ['debugger'],
-  plugins: [babel(), dtsPlugin(), nodeExternalsPlugin()],
+  plugins: [babel(), nodeExternalsPlugin()],
   tsconfig: 'tsconfig.json',
 })

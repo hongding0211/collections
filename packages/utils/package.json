@@ -1,0 +1,13 @@
+{
+  "name": "@hong97/collections-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p ./tsconfig-build.json && node scripts/build.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
