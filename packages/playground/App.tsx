@@ -1,11 +1,46 @@
-import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, Text, View } from 'react-native'
+import React, { useContext, useRef } from 'react'
+import { StyleSheet, Text, View, TextInput } from 'react-native'
+import {
+  KeyboardAvoidingScrollView,
+  KeyboardAvoidingScrollViewContext,
+} from 'react-native-collections/core'
+
+const Child = () => {
+  const inputRef = useRef<TextInput>(null)
+
+  const keyboardAvoidingScrollViewContext = useContext(
+    KeyboardAvoidingScrollViewContext,
+  )
+  const { focusElem } = keyboardAvoidingScrollViewContext || {}
+  return (
+    <>
+      <View style={{ height: 400, backgroundColor: 'blue' }} />
+      <TextInput
+        ref={inputRef}
+        style={{
+          height: 200,
+          backgroundColor: '#eee',
+          borderWidth: 2,
+          borderColor: 'green',
+        }}
+        onFocus={() => focusElem?.(inputRef.current)}
+      />
+    </>
+  )
+}
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <KeyboardAvoidingScrollView
+        enable
+        style={{
+          borderWidth: 2,
+          borderColor: 'red',
+        }}
+      >
+        <Child />
+      </KeyboardAvoidingScrollView>
     </View>
   )
 }
@@ -13,8 +48,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 })

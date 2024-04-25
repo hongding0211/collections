@@ -9,6 +9,7 @@ import {
   Animated,
   Dimensions,
   Keyboard,
+  Platform,
   ScrollView,
   ScrollViewProps,
 } from 'react-native'
@@ -48,7 +49,7 @@ export const KeyboardAvoidingScrollView: React.FC<
   const topToContainer = useRef<number>(0)
   const bottomToWindow = useRef<number>(0)
   const lock = useRef<boolean>(false)
-  const measureTasks = useRef<Promise<void>[]>([])
+  const measureTasks = useRef<Promise<void>>()
   const bottomAnimRef = useRef(new Animated.Value(0))
 
   const handleFocusElem = useCallback((elem: any) => {
@@ -57,14 +58,12 @@ export const KeyboardAvoidingScrollView: React.FC<
         ? top - scrollPosY.current
         : 0
     })
-    measureTasks.current.push(
-      new Promise(resolve => {
-        elem.measureInWindow((left, top, width, height) => {
-          bottomToWindow.current = WINDOW_HEIGHT - top - height - bottomOffset
-          resolve()
-        })
-      }),
-    )
+    measureTasks.current = new Promise(resolve => {
+      elem.measureInWindow((left, top, width, height) => {
+        bottomToWindow.current = WINDOW_HEIGHT - top - height - bottomOffset
+        resolve()
+      })
+    })
   }, [])
 
   const handleLayout = useCallback(e => {
@@ -77,26 +76,30 @@ export const KeyboardAvoidingScrollView: React.FC<
   }, [])
 
   useEffect(() => {
-    Keyboard.addListener('keyboardWillShow', e => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow'
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide'
+    Keyboard.addListener(showEvent, e => {
       if (lock.current) {
         return
       }
       lock.current = true
       const keyboardHeight = e.endCoordinates.height
       Animated.timing(bottomAnimRef.current, {
-        toValue: keyboardHeight,
+        toValue: keyboardHeight + bottomOffset,
         duration: 0,
         useNativeDriver: false,
       }).start()
-      Promise.all(measureTasks.current).then(() => {
+      measureTasks.current.then(() => {
         macroTask(() => {
           scrollViewRef.current?.scrollTo({
             y: scrollPosY.current - (bottomToWindow.current - keyboardHeight),
           })
-        }, 200)
+        }, 0)
       })
     })
-    Keyboard.addListener('keyboardWillHide', () => {
+    Keyboard.addListener(hideEvent, () => {
       lock.current = false
       Animated.timing(bottomAnimRef.current, {
         toValue: 0,
@@ -107,8 +110,8 @@ export const KeyboardAvoidingScrollView: React.FC<
     return () => {
       lock.current = false
       measureTasks.current = []
-      Keyboard.removeAllListeners('keyboardWillShow')
-      Keyboard.removeAllListeners('keyboardWillHide')
+      Keyboard.removeAllListeners(showEvent)
+      Keyboard.removeAllListeners(hideEvent)
     }
   }, [])
 
@@ -132,6 +135,7 @@ export const KeyboardAvoidingScrollView: React.FC<
         keyboardDismissMode={keyboardDismissMode}
         onLayout={handleLayout}
         onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
         <Animated.View
           style={{
