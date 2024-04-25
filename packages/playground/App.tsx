@@ -1,52 +1,21 @@
-import React, { useContext, useRef } from 'react'
-import { StyleSheet, Text, View, TextInput } from 'react-native'
-import {
-  KeyboardAvoidingScrollView,
-  KeyboardAvoidingScrollViewContext,
-} from 'react-native-collections/core'
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import { NavigationContainer } from '@react-navigation/native'
+import React from 'react'
+import 'react-native-gesture-handler'
 
-const Child = () => {
-  const inputRef = useRef<TextInput>(null)
+import { KeyboardAvoidingScrollViewPage } from './pages/keyboard-avoiding-scroll-view'
 
-  const keyboardAvoidingScrollViewContext = useContext(
-    KeyboardAvoidingScrollViewContext,
-  )
-  const { focusElem } = keyboardAvoidingScrollViewContext || {}
-  return (
-    <>
-      <View style={{ height: 400, backgroundColor: 'blue' }} />
-      <TextInput
-        ref={inputRef}
-        style={{
-          height: 200,
-          backgroundColor: '#eee',
-          borderWidth: 2,
-          borderColor: 'green',
-        }}
-        onFocus={() => focusElem?.(inputRef.current)}
-      />
-    </>
-  )
-}
+const Drawer = createDrawerNavigator()
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <KeyboardAvoidingScrollView
-        enable
-        style={{
-          borderWidth: 2,
-          borderColor: 'red',
-        }}
-      >
-        <Child />
-      </KeyboardAvoidingScrollView>
-    </View>
+    <NavigationContainer>
+      <Drawer.Navigator>
+        <Drawer.Screen
+          name="KeyboardAvoidingScrollViewPage"
+          component={KeyboardAvoidingScrollViewPage}
+        />
+      </Drawer.Navigator>
+    </NavigationContainer>
   )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-})
