@@ -1,0 +1,27 @@
+{
+  "name": "react-native-collections",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "playground": "lerna run start --scope=playground",
+    "build": "lerna run build --scope=core",
+    "prepare": "husky"
+  },
+  "keywords": [],
+  "author": "HongDing",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "0.20.2",
+    "husky": "^9.0.11",
+    "lerna": "^8.1.2",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --ignore-path ./.prettierignore --write "
+    ]
+  }
+}
