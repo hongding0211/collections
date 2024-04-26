@@ -90,6 +90,10 @@ const Child = () => {
     sheetId.current = sheet.show(Content, {
       bottomOffset: 88,
       useCloseAnim: true,
+      onPressMask: () => {
+        sheet.destroy(sheetId.current)
+        shown.current = false
+      },
     })
     shown.current = true
   }
