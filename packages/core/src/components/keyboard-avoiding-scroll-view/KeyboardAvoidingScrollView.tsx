@@ -13,6 +13,7 @@ import {
   ScrollView,
   ScrollViewProps,
 } from 'react-native'
+
 import { macroTask } from '../../utils'
 
 const WINDOW_HEIGHT = Dimensions.get('window').height
@@ -37,7 +38,7 @@ export const KeyboardAvoidingScrollView: React.FC<
     keyboardShouldPersistTaps = 'handled',
     keyboardDismissMode = 'on-drag',
     children,
-    enable,
+    enable = true,
     onScroll,
     ...rest
   } = props

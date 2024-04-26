@@ -4,6 +4,7 @@ import React from 'react'
 import 'react-native-gesture-handler'
 
 import { KeyboardAvoidingScrollViewPage } from './pages/keyboard-avoiding-scroll-view'
+import { Popup } from './pages/popup'
 
 const Drawer = createDrawerNavigator()
 
@@ -15,6 +16,7 @@ export default function App() {
           name="KeyboardAvoidingScrollViewPage"
           component={KeyboardAvoidingScrollViewPage}
         />
+        <Drawer.Screen name="Popup" component={Popup} />
       </Drawer.Navigator>
     </NavigationContainer>
   )
