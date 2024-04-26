@@ -6,6 +6,7 @@ export const DEFAULT_SHEET_OPTIONS: SheetOptions = {
   useAnim: true,
   useCloseAnim: false,
   bottomOffset: 0,
+  onPressMask: () => void 0,
 }
 
 export const DEFAULT_CONTEXT = {

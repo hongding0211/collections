@@ -1,11 +1,4 @@
-import React, {
-  Ref,
-  createRef,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 
 import { Sheet } from './Sheet'
 import { SheetContext } from './SheetContext'
@@ -15,69 +8,72 @@ import { ISheetProviderProps, SheetInstance, SheetOptions } from './types'
 export const SheetProvider: React.FC<ISheetProviderProps> = props => {
   const { children } = props
 
-  const [renderInstances, setRenderInstances] = useState<
-    {
-      id: number
-      instance: React.ReactElement
-      options: SheetOptions
-    }[]
-  >([])
+  // a state to trigger re-render
+  const [renderCnt, setRenderCnt] = useState(0)
 
   const _cnt = useRef(0)
 
-  const sheetInstanceMap = useRef<Map<number, SheetInstance>>(new Map())
+  const sheetMap = useRef<
+    Map<
+      number,
+      {
+        id: number
+        renderInstance: React.ReactElement
+        options: SheetOptions
+        instance?: SheetInstance
+      }
+    >
+  >(new Map())
 
   const appendInstance = useCallback(
     (renderFn: React.FC, options?: Partial<SheetOptions>) => {
-      const id = _cnt.current++
+      const _id = _cnt.current++
       const _options = options
         ? {
             ...DEFAULT_SHEET_OPTIONS,
             ...options,
           }
         : DEFAULT_SHEET_OPTIONS
-      setRenderInstances(r => [
-        ...r,
-        {
-          id,
-          instance: React.createElement(renderFn),
-          options: _options,
-        },
-      ])
-      return id
+      const _renderInstance = React.createElement(renderFn)
+      sheetMap.current.set(_id, {
+        id: _id,
+        renderInstance: _renderInstance,
+        options: _options,
+      })
+      setRenderCnt(r => r + 1)
+      return _id
     },
     [],
   )
 
-  const dropInstance = useCallback(
-    (id: number) => {
-      const idx = renderInstances.findIndex(r => r.id === id)
-      if (idx === -1) {
+  const dropInstance = useCallback((id: number) => {
+    if (!sheetMap.current.has(id)) {
+      return
+    }
+    const sheet = sheetMap.current.get(id)
+    /**
+     * if useCloseAnim is enabled, then close the sheet using exploded instance,
+     * otherwise just drop its instance.
+     */
+    if (sheet.options.useCloseAnim) {
+      const sheet = sheetMap.current.get(id)
+      if (!sheet) {
         return
       }
-      /**
-       * if useCloseAnim is enabled, then close the sheet using exploded instance,
-       * otherwise just drop its instance.
-       */
-      if (renderInstances[idx].options.useCloseAnim) {
-        const instance = sheetInstanceMap.current.get(id)
-        if (!instance) {
-          return
-        }
-        instance.close().then(() => {
-          setRenderInstances(r => r.filter(e => e.id !== id))
-        })
-      } else {
-        setRenderInstances(r => r.filter(e => e.id !== id))
-      }
-      sheetInstanceMap.current.delete(id)
-    },
-    [renderInstances],
-  )
+      sheet.instance.close().then(() => {
+        sheetMap.current.delete(id)
+        setRenderCnt(r => r + 1)
+      })
+    } else {
+      sheetMap.current.delete(id)
+      setRenderCnt(r => r + 1)
+    }
+    sheetMap.current.delete(id)
+  }, [])
 
   const dropAllInstances = useCallback(() => {
-    sheetInstanceMap.current.clear()
-    setRenderInstances([])
+    sheetMap.current.clear()
+    setRenderCnt(r => r + 1)
   }, [])
 
   const value = useMemo(
@@ -93,14 +89,17 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
 
   return (
     <SheetContext.Provider value={value}>
-      {renderInstances.map(i => (
+      {[...sheetMap.current.values()].map(i => (
         <Sheet
           key={i.id}
           id={i.id}
           options={i.options}
-          getInstance={instance => sheetInstanceMap.current.set(i.id, instance)}
+          onPressMask={i.options.onPressMask}
+          getInstance={instance =>
+            (sheetMap.current.get(i.id).instance = instance)
+          }
         >
-          {i.instance}
+          {i.renderInstance}
         </Sheet>
       ))}
       {memoedChildren}

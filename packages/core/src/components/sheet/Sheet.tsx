@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef } from 'react'
+import React, { useRef } from 'react'
 import {
   Animated,
   Dimensions,
@@ -7,11 +7,11 @@ import {
   View,
 } from 'react-native'
 
-import { ISheetProps, SheetInstance } from './types'
+import { ISheetProps } from './types'
 
 const DEFAULT_Z_INDEX = 10000
 
-const { width: WIDTH, height: HEIGHT } = Dimensions.get('screen')
+const { height: HEIGHT } = Dimensions.get('screen')
 
 const styles = StyleSheet.create({
   sheetContainer: {
@@ -19,10 +19,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+  mask: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
 })
 
-export const Sheet = forwardRef<SheetInstance, ISheetProps>((props, ref) => {
-  const { id, children, options, getInstance } = props
+export const Sheet: React.FC<ISheetProps> = props => {
+  const { id, children, options, getInstance, onPressMask } = props
 
   /**
    * General Refs
@@ -36,6 +43,8 @@ export const Sheet = forwardRef<SheetInstance, ISheetProps>((props, ref) => {
   const opacity = useRef(new Animated.Value(0)).current
   const top = useRef(new Animated.Value(0)).current
 
+  const maskZIndex = useRef(new Animated.Value(-1)).current
+
   const handleLayout = (e: LayoutChangeEvent) => {
     if (hasLayoutMeasured.current) {
       return
@@ -46,12 +55,18 @@ export const Sheet = forwardRef<SheetInstance, ISheetProps>((props, ref) => {
       },
     } = e
     hasLayoutMeasured.current = true
-    // schedule a anim
+
+    // calculate the start and end position
     const startY = HEIGHT
     const endY = HEIGHT - height - options.bottomOffset
+
+    // set sheet and mask visible
     zIndex.setValue(DEFAULT_Z_INDEX + id)
+    maskZIndex.setValue(DEFAULT_Z_INDEX + id)
     opacity.setValue(1)
+
     if (options.useAnim) {
+      // schedule an anim if useAnim is enabled
       top.setValue(startY)
       Animated.spring(top, {
         toValue: endY,
@@ -62,8 +77,10 @@ export const Sheet = forwardRef<SheetInstance, ISheetProps>((props, ref) => {
     }
   }
 
+  // start a close anim
   const close = () =>
     new Promise(resolve => {
+      maskZIndex.setValue(-1)
       Animated.spring(top, {
         toValue: HEIGHT,
         useNativeDriver: false,
@@ -75,17 +92,31 @@ export const Sheet = forwardRef<SheetInstance, ISheetProps>((props, ref) => {
   })
 
   return (
-    <Animated.View
-      style={[
-        styles.sheetContainer,
-        {
-          zIndex,
-          opacity,
-          top,
-        },
-      ]}
-    >
-      <View onLayout={handleLayout}>{children}</View>
-    </Animated.View>
+    <>
+      {!!options.showMask && (
+        <Animated.View
+          style={[
+            styles.mask,
+            {
+              backgroundColor: options.maskColor,
+              zIndex: maskZIndex,
+            },
+          ]}
+          onTouchEnd={onPressMask}
+        />
+      )}
+      <Animated.View
+        style={[
+          styles.sheetContainer,
+          {
+            zIndex,
+            opacity,
+            top,
+          },
+        ]}
+      >
+        <View onLayout={handleLayout}>{children}</View>
+      </Animated.View>
+    </>
   )
-})
+}

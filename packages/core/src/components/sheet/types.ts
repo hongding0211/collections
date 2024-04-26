@@ -15,6 +15,7 @@ export interface SheetOptions {
   useAnim: boolean
   useCloseAnim: boolean
   bottomOffset: number
+  onPressMask: () => void
 }
 
 export type UseSheet = {
@@ -36,4 +37,5 @@ export interface ISheetProps {
   id: number
   options?: SheetOptions
   getInstance?: (instance: SheetInstance) => void
+  onPressMask?: () => void
 }
