@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { Pressable, PressableProps, StyleSheet, Text, View } from 'react-native'
 import { SheetProvider, useSheet } from 'react-native-collections/core'
 
@@ -106,7 +106,7 @@ const Child = () => {
 
 export const Sheet: React.FC = () => {
   return (
-    <SheetProvider monoInstance>
+    <SheetProvider>
       <Child />
     </SheetProvider>
   )

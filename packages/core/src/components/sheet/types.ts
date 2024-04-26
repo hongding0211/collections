@@ -15,7 +15,7 @@ export interface SheetOptions {
   useAnim: boolean
   useCloseAnim: boolean
   bottomOffset: number
-  onPressMask: () => void
+  onPressMask?: () => void
 }
 
 export type UseSheet = {
