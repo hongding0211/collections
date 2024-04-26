@@ -4,7 +4,7 @@ import React from 'react'
 import 'react-native-gesture-handler'
 
 import { KeyboardAvoidingScrollViewPage } from './pages/keyboard-avoiding-scroll-view'
-import { Popup } from './pages/popup'
+import { Sheet } from './pages/sheet'
 
 const Drawer = createDrawerNavigator()
 
@@ -12,11 +12,11 @@ export default function App() {
   return (
     <NavigationContainer>
       <Drawer.Navigator>
+        <Drawer.Screen name="Sheet" component={Sheet} />
         <Drawer.Screen
           name="KeyboardAvoidingScrollViewPage"
           component={KeyboardAvoidingScrollViewPage}
         />
-        <Drawer.Screen name="Popup" component={Popup} />
       </Drawer.Navigator>
     </NavigationContainer>
   )

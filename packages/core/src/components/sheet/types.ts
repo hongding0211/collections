@@ -1,6 +1,6 @@
 import React from 'react'
 
-export interface IPopupContext {
+export interface ISheetContext {
   instances: Record<number, React.ReactElement>
   appendInstance: (renderFn: React.FC, options?: ShowOptions) => number
   dropInstance: (id: number) => void
@@ -9,12 +9,12 @@ export interface IPopupContext {
 
 export interface ShowOptions {}
 
-export type UsePopup = {
+export type UseSheet = {
   show: (renderFn: React.FC, options?: ShowOptions) => number
   destroy: (id: number) => void
   destroyAll: () => void
 }
 
-export interface IPopupProviderProps {
+export interface ISheetProviderProps {
   children: React.ReactNode
 }

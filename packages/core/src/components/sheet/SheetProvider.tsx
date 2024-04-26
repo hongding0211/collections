@@ -1,8 +1,9 @@
 import React, { useCallback, useMemo, useRef } from 'react'
-import { IPopupProviderProps, ShowOptions } from './types'
-import { PopupContext } from './PopupContext'
 
-export const PopupProvider: React.FC<IPopupProviderProps> = props => {
+import { SheetContext } from './SheetContext'
+import { ISheetProviderProps, ShowOptions } from './types'
+
+export const SheetProvider: React.FC<ISheetProviderProps> = props => {
   const { children } = props
 
   const _cnt = useRef(0)
@@ -32,8 +33,8 @@ export const PopupProvider: React.FC<IPopupProviderProps> = props => {
   const memoedChildren = useMemo(() => children, [children])
 
   return (
-    <PopupContext.Provider value={value}>
+    <SheetContext.Provider value={value}>
       {memoedChildren}
-    </PopupContext.Provider>
+    </SheetContext.Provider>
   )
 }

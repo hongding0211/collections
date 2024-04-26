@@ -1,9 +1,10 @@
 import { useContext } from 'react'
-import { PopupContext } from './PopupContext'
-import { UsePopup } from './types'
 
-export function usePopup(): UsePopup {
-  const popupContext = useContext(PopupContext)
+import { SheetContext } from './SheetContext'
+import { UseSheet } from './types'
+
+export function useSheet(): UseSheet {
+  const popupContext = useContext(SheetContext)
   const { appendInstance, dropInstance, dropAllInstances } = popupContext
 
   return {

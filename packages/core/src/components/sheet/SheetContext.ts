@@ -1,7 +1,8 @@
 import { createContext } from 'react'
-import { IPopupContext } from './types'
 
-export const PopupContext = createContext<IPopupContext>({
+import { ISheetContext } from './types'
+
+export const SheetContext = createContext<ISheetContext>({
   instances: {},
   appendInstance: () => -1,
   dropInstance: () => null,
