@@ -2,6 +2,8 @@ import React, { useRef } from 'react'
 import { Pressable, PressableProps, StyleSheet, Text, View } from 'react-native'
 import { SheetProvider, useSheet } from 'react-native-collections/core'
 
+import { macroTask } from '../../../core/src/utils'
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -78,36 +80,25 @@ const Content = () => (
 )
 
 const Child = () => {
-  const sheetId = useRef(-1)
-  const shown = useRef(false)
-
   const sheet = useSheet()
 
   const handleOpen = () => {
-    if (shown.current) {
-      return
+    const show = () => {
+      const sheetId = sheet.show(Content, {
+        bottomOffset: 88,
+        useCloseAnim: true,
+        onPressMask: () => {
+          sheet.destroy(sheetId)
+        },
+      })
     }
-    sheetId.current = sheet.show(Content, {
-      bottomOffset: 88,
-      // useCloseAnim: true,
-      onPressMask: () => {
-        sheet.destroy(sheetId.current)
-        shown.current = false
-      },
-    })
-    shown.current = true
-  }
-
-  const handleClose = () => {
-    sheet.destroy(sheetId.current)
-    shown.current = false
+    macroTask(show).next(show, 1000).next(show, 1000)
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.row}>
         <Button title="Open Sheet" onPress={handleOpen} />
-        <Button title="Close Sheet" onPress={handleClose} />
       </View>
     </View>
   )
@@ -115,7 +106,7 @@ const Child = () => {
 
 export const Sheet: React.FC = () => {
   return (
-    <SheetProvider>
+    <SheetProvider monoInstance>
       <Child />
     </SheetProvider>
   )

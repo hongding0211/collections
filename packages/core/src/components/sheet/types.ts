@@ -1,4 +1,4 @@
-import React, { Ref } from 'react'
+import React from 'react'
 
 export interface ISheetContext {
   appendInstance: (
@@ -26,6 +26,10 @@ export type UseSheet = {
 
 export interface ISheetProviderProps {
   children: React.ReactNode
+  /**
+   * Only allow one instance of sheet to be shown at a time.
+   */
+  monoInstance?: boolean
 }
 
 export type SheetInstance = {

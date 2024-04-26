@@ -35,14 +35,12 @@ export const Sheet: React.FC<ISheetProps> = props => {
    * General Refs
    */
   const hasLayoutMeasured = useRef(false)
-
   /**
    * Anim Refs
    */
   const zIndex = useRef(new Animated.Value(-1)).current
   const opacity = useRef(new Animated.Value(0)).current
   const top = useRef(new Animated.Value(0)).current
-
   const maskZIndex = useRef(new Animated.Value(-1)).current
 
   const handleLayout = (e: LayoutChangeEvent) => {
