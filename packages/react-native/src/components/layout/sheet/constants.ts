@@ -2,7 +2,8 @@ import { SheetOptions } from './types'
 
 export const DEFAULT_SHEET_OPTIONS: SheetOptions = {
   showMask: true,
-  maskColor: 'rgba(0, 0, 0, 0.2)',
+  maskAnim: true,
+  maskColor: 'rgba(0, 0, 0, 0.75)',
   useAnim: true,
   useSpringAnim: false,
   animationDuration: 200,

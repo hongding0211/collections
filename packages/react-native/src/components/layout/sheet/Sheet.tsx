@@ -42,6 +42,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
   const opacity = useRef(new Animated.Value(0)).current
   const top = useRef(new Animated.Value(0)).current
   const maskZIndex = useRef(new Animated.Value(-1)).current
+  const maskOpacity = useRef(new Animated.Value(0)).current
 
   const handleLayout = (e: LayoutChangeEvent) => {
     const {
@@ -66,8 +67,18 @@ export const Sheet: React.FC<ISheetProps> = props => {
 
       // set sheet and mask visible
       zIndex.setValue(DEFAULT_Z_INDEX + id)
-      maskZIndex.setValue(DEFAULT_Z_INDEX + id)
       opacity.setValue(1)
+      maskZIndex.setValue(DEFAULT_Z_INDEX + id)
+      if (options.maskAnim && options.useAnim) {
+        maskOpacity.setValue(0)
+        Animated.timing(maskOpacity, {
+          toValue: 1,
+          duration: options.animationDuration / 2,
+          useNativeDriver: false,
+        }).start()
+      } else {
+        maskOpacity.setValue(1)
+      }
 
       if (options.useAnim) {
         top.setValue(startY)
@@ -103,7 +114,17 @@ export const Sheet: React.FC<ISheetProps> = props => {
   // start a close anim
   const close = () =>
     new Promise(resolve => {
-      maskZIndex.setValue(-1)
+      if (options.maskAnim) {
+        Animated.timing(maskOpacity, {
+          toValue: 0,
+          duration: options.animationDuration / 2,
+          useNativeDriver: false,
+        }).start(() => {
+          maskZIndex.setValue(-1)
+        })
+      } else {
+        maskZIndex.setValue(-1)
+      }
       if (options.useSpringAnim) {
         Animated.spring(top, {
           toValue: HEIGHT,
@@ -131,6 +152,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
             {
               backgroundColor: options.maskColor,
               zIndex: maskZIndex,
+              opacity: maskOpacity,
             },
           ]}
           onTouchEnd={onPressMask}

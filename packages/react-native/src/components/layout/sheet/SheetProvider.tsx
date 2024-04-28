@@ -88,12 +88,13 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
         return
       }
       sheet.instance.close().then(() => {
+        sheetMap.current.delete(id)
         setRenderCnt(r => r + 1)
       })
     } else {
+      sheetMap.current.delete(id)
       setRenderCnt(r => r + 1)
     }
-    sheetMap.current.delete(id)
   }, [])
 
   const dropAllInstances = useCallback(() => {

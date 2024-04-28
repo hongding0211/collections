@@ -1,4 +1,4 @@
-import { SheetProvider, useSheet } from '@hong97/collections-react-native'
+import { useSheet } from '@hong97/collections-react-native'
 import React, { useRef, useState } from 'react'
 import { Pressable, PressableProps, StyleSheet, Text, View } from 'react-native'
 
@@ -35,10 +35,23 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: '#868686',
   },
+  buttonRed: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgb(221, 131, 131)',
+  },
   buttonText: {
     fontSize: 12,
     fontWeight: '500',
     color: '#333',
+  },
+  buttonTextRed: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#e92626',
   },
   placeholder: {
     backgroundColor: '#dedede',
@@ -71,9 +84,21 @@ const styles = StyleSheet.create({
   },
 })
 
-const Button: React.FC<PressableProps & { title: string }> = props => (
-  <Pressable {...props} style={styles.button}>
-    <Text style={styles.buttonText}>{props.title}</Text>
+const Button: React.FC<
+  PressableProps & { title: string; type?: string }
+> = props => (
+  <Pressable
+    {...props}
+    style={[styles.button, props.type === 'red' ? styles.buttonRed : undefined]}
+  >
+    <Text
+      style={[
+        styles.buttonText,
+        props.type === 'red' ? styles.buttonTextRed : undefined,
+      ]}
+    >
+      {props.title}
+    </Text>
   </Pressable>
 )
 
@@ -94,7 +119,7 @@ const Content = () => {
   )
 }
 
-const Child = () => {
+export const Sheet: React.FC = () => {
   const sheet = useSheet()
 
   const [type2SheetOnend, setType2SheetOpened] = useState(false)
@@ -105,8 +130,6 @@ const Child = () => {
     switch (type) {
       case 0: {
         const sheetId = sheet.show(Content, {
-          bottomOffset: 88,
-          useSpringAnim: true,
           useCloseAnim: true,
           onPressMask: () => {
             sheet.destroy(sheetId)
@@ -116,7 +139,6 @@ const Child = () => {
       }
       case 1: {
         const sheetId = sheet.show(Content, {
-          bottomOffset: 88,
           useAnim: false,
           onPressMask: () => {
             sheet.destroy(sheetId)
@@ -130,12 +152,21 @@ const Child = () => {
           setType2SheetOpened(false)
         } else {
           type2SheetId.current = sheet.show(Content, {
-            bottomOffset: 88,
             useSpringAnim: true,
             showMask: false,
           })
           setType2SheetOpened(true)
         }
+        break
+      }
+      case 3: {
+        const sheetId = sheet.show(Content, {
+          useSpringAnim: true,
+          useCloseAnim: true,
+          onPressMask: () => {
+            sheet.destroy(sheetId)
+          },
+        })
         break
       }
     }
@@ -151,6 +182,10 @@ const Child = () => {
         <View style={styles.row}>
           <Button title="Open Sheet" onPress={() => handleOpen(0)} />
           <Button
+            title="Open Sheet Using Spring Anim"
+            onPress={() => handleOpen(3)}
+          />
+          <Button
             title="Open Sheet Without Anim"
             onPress={() => handleOpen(1)}
           />
@@ -160,18 +195,11 @@ const Child = () => {
                 ? 'Close Sheet Without Mask'
                 : 'Open Sheet Without Mask'
             }
+            type={type2SheetOnend ? 'red' : undefined}
             onPress={() => handleOpen(2)}
           />
         </View>
       </View>
     </View>
-  )
-}
-
-export const Sheet: React.FC = () => {
-  return (
-    <SheetProvider>
-      <Child />
-    </SheetProvider>
   )
 }

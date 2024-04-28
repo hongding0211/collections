@@ -11,6 +11,7 @@ export interface ISheetContext {
 
 export interface SheetOptions {
   showMask: boolean
+  maskAnim: boolean
   maskColor: string
   useAnim: boolean
   useSpringAnim: boolean
