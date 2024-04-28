@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "rn-playground": "lerna run start --scope=@hong97/collections-react-native-playground",
-    "build": "lerna run build --scope=@hong97/collections-{react-native-playground,utils}",
+    "build": "lerna run build --scope=@hong97/collections-{utils,react-native}",
     "prepare": "husky"
   },
   "keywords": [],

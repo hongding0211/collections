@@ -1,6 +1,6 @@
 {
   "name": "@hong97/collections-react-native-playground",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "scripts": {
     "start": "expo start",
