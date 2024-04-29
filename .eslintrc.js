@@ -109,5 +109,6 @@ module.exports = {
     'no-else-return': 0,
     'no-plusplus': 0,
     'prefer-spread': 0,
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
   },
 }

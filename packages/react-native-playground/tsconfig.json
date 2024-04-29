@@ -3,6 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
+      "@hong97/collections-react": ["../react/src/index.ts"],
       "@hong97/collections-react-native": ["../react-native/src/index.ts"],
       "@hong97/collections-utils": ["../utils/src/index.ts"]
     }

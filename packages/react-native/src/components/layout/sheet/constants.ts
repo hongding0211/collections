@@ -1,18 +1,22 @@
-import { SheetOptions } from './types'
+import { DEFAULT_ANIMATION_OPTIONS } from '../../../utils'
+import { ISheetInstanceContext, SheetOptions } from './types'
 
 export const DEFAULT_SHEET_OPTIONS: SheetOptions = {
+  type: 'Hug',
+  maxHeight: Infinity,
   showMask: true,
-  maskAnim: true,
   maskColor: 'rgba(0, 0, 0, 0.75)',
-  useAnim: true,
-  useSpringAnim: false,
-  animationDuration: 200,
-  useCloseAnim: false,
   bottomOffset: 0,
+  ...DEFAULT_ANIMATION_OPTIONS,
 }
 
 export const DEFAULT_CONTEXT = {
   appendInstance: () => -1,
   dropInstance: () => null,
   dropAllInstances: () => null,
+}
+
+export const DEFAULT_SHEET_INSTANCE_CONTEXT: ISheetInstanceContext = {
+  addEventListener: () => null,
+  removeEventListener: () => null,
 }

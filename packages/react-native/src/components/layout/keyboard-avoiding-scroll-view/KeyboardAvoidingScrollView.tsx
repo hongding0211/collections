@@ -10,6 +10,7 @@ import {
   Animated,
   Dimensions,
   Keyboard,
+  LayoutChangeEvent,
   Platform,
   ScrollView,
   ScrollViewProps,
@@ -53,21 +54,23 @@ export const KeyboardAvoidingScrollView: React.FC<
   const bottomAnimRef = useRef(new Animated.Value(0))
 
   const handleFocusElem = useCallback((elem: any) => {
-    elem.measureLayout(scrollViewRef.current, (_, top) => {
+    elem.measureLayout(scrollViewRef.current, (_: number, top: number) => {
       topToContainer.current = containerHeight.current
         ? top - scrollPosY.current
         : 0
     })
     measureTasks.current = new Promise(resolve => {
-      elem.measureInWindow((left, top, width, height) => {
-        bottomToWindow.current = WINDOW_HEIGHT - top - height - bottomOffset
-        resolve()
-      })
+      elem.measureInWindow(
+        (left: number, top: number, width: number, height: number) => {
+          bottomToWindow.current = WINDOW_HEIGHT - top - height - bottomOffset
+          resolve()
+        },
+      )
     })
   }, [])
 
-  const handleLayout = useCallback(e => {
-    containerHeight.current = e?.nativeEvent?.layout?.height
+  const handleLayout = useCallback((e: LayoutChangeEvent) => {
+    containerHeight.current = e.nativeEvent.layout.height
   }, [])
 
   const handleScroll = useCallback((e: any) => {
