@@ -1,6 +1,6 @@
 {
-  "name": "@hong97/collections-react-native",
-  "version": "0.0.2",
+  "name": "@hong97/collections-react",
+  "version": "0.0.1",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -11,13 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@hong97/collections-utils": "workspace:*",
-    "@hong97/collections-react": "workspace:*"
+    "@hong97/collections-utils": "workspace:*"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-native": "*",
-    "react-native-gesture-handler": "*"
+    "react": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

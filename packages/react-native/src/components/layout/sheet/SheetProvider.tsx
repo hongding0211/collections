@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { Sheet } from './Sheet'
 import { SheetContext } from './SheetContext'
@@ -77,17 +78,13 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
     if (!sheetMap.current.has(id)) {
       return
     }
-    const sheet = sheetMap.current.get(id)
+    const sheet = sheetMap.current.get(id)!
     /**
-     * if useCloseAnim is enabled, then close the sheet using exploded instance,
+     * if useAnim is enabled, then close the sheet using exploded instance,
      * otherwise just drop its instance.
      */
-    if (sheet.options.useCloseAnim) {
-      const sheet = sheetMap.current.get(id)
-      if (!sheet) {
-        return
-      }
-      sheet.instance.close().then(() => {
+    if (sheet.options.useAnim) {
+      sheet.instance?.close().then(() => {
         sheetMap.current.delete(id)
         setRenderCnt(r => r + 1)
       })
@@ -112,21 +109,24 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
   )
 
   return (
-    <SheetContext.Provider value={value}>
-      {[...sheetMap.current.values()].map(i => (
-        <Sheet
-          key={i.id}
-          id={i.id}
-          options={i.options}
-          onPressMask={i.options.onPressMask}
-          getInstance={instance =>
-            (sheetMap.current.get(i.id).instance = instance)
-          }
-        >
-          {i.renderInstance}
-        </Sheet>
-      ))}
-      {children}
-    </SheetContext.Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SheetContext.Provider value={value}>
+        {[...sheetMap.current.values()].map(i => (
+          <Sheet
+            key={i.id}
+            id={i.id}
+            options={i.options}
+            onPressMask={i.options.onPressMask}
+            onFlingClose={i.options.onFlingClose}
+            getInstance={instance =>
+              (sheetMap.current.get(i.id)!.instance = instance)
+            }
+          >
+            {i.renderInstance}
+          </Sheet>
+        ))}
+        {children}
+      </SheetContext.Provider>
+    </GestureHandlerRootView>
   )
 }

@@ -1,4 +1,8 @@
+import { ContextEventsValue } from '@hong97/collections-react'
 import React from 'react'
+import { ScrollViewProps } from 'react-native'
+
+import { AnimationOptions } from '../../../utils'
 
 export interface ISheetContext {
   appendInstance: (
@@ -9,16 +13,15 @@ export interface ISheetContext {
   dropAllInstances: () => void
 }
 
-export interface SheetOptions {
+export interface SheetOptions extends AnimationOptions {
+  type: 'Hug' | 'Segment'
+  maxHeight: number
+  segmentHeightList?: number[]
   showMask: boolean
-  maskAnim: boolean
   maskColor: string
-  useAnim: boolean
-  useSpringAnim: boolean
-  animationDuration: number
-  useCloseAnim: boolean
   bottomOffset: number
   onPressMask?: () => void
+  onFlingClose?: () => void
 }
 
 export type UseSheet = {
@@ -42,7 +45,18 @@ export type SheetInstance = {
 export interface ISheetProps {
   children: React.ReactNode
   id: number
-  options?: SheetOptions
+  options: SheetOptions
   getInstance?: (instance: SheetInstance) => void
   onPressMask?: () => void
+  onFlingClose?: () => void
 }
+
+export interface ISheetInstanceEvents {
+  onReadyEnableScrollView: undefined
+}
+
+export interface ISheetInstanceContext
+  extends ContextEventsValue<ISheetInstanceEvents> {}
+
+export interface ISheetScrollViewProps
+  extends Omit<ScrollViewProps, 'scrollEnabled'> {}
