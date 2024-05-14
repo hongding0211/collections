@@ -91,7 +91,8 @@ export const Sheet: React.FC<ISheetProps> = props => {
   const layoutHeight = useRef<number | undefined>(undefined)
   const currentSegmentIndex = useRef(0)
   const expanded = useRef(false)
-  const actualHeight = useRef(0)
+  const firstTimeMeasuredHeight = useRef(0)
+  const fireShowAnimFn = useRef<() => any>(() => null)
   /**
    * Anim Refs
    */
@@ -136,7 +137,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
     ) {
       return
     }
-    if (actualHeight.current > options.expandThreshold) {
+    if (firstTimeMeasuredHeight.current > options.expandThreshold) {
       const targetHeight = options.expandTarget
       const endY = HEIGHT - targetHeight - options.bottomOffset
       onEvent('onReadyEnableScrollView')
@@ -218,7 +219,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
       // This means the sheet is not shown yet.
       // In this case, schedule an anim to show the sheet.
       if (layoutHeight.current === undefined) {
-        actualHeight.current = height
+        firstTimeMeasuredHeight.current = height
 
         // for Expandable type
         // based on the init height and expand threshold
@@ -248,8 +249,9 @@ export const Sheet: React.FC<ISheetProps> = props => {
 
         // if type is Expandable
         // we cannot fire an anim immediately
-        // this is because we use setState to transfer container height from 'auto' to 'containerHeight'
-        const fireAnim = () => {
+        // this is because we use setState to transform container height from 'auto' to 'containerHeight'
+        // instead, we fire this anim in an effect.
+        fireShowAnimFn.current = () => {
           // set sheet and mask visible
           zIndex.setValue(DEFAULT_Z_INDEX + id)
           opacity.setValue(1)
@@ -259,9 +261,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
           startAnim(top, endY, options)
         }
         if (_type !== 'Expandable') {
-          fireAnim()
-        } else {
-          setTimeout(fireAnim, 32)
+          fireShowAnimFn.current()
         }
 
         layoutHeight.current = height
@@ -330,6 +330,12 @@ export const Sheet: React.FC<ISheetProps> = props => {
       onEvent('onReadyEnableScrollView')
     }
   }, [])
+
+  useEffect(() => {
+    if (_type === 'Expandable' && useAutoHeight === false) {
+      fireShowAnimFn.current()
+    }
+  }, [_type, useAutoHeight])
 
   return (
     <SheetInstanceContext.Provider value={sheetInstanceContextValue}>
