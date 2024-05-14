@@ -99,13 +99,18 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
     setRenderCnt(r => r + 1)
   }, [])
 
+  const getInstance = useCallback((id: number) => {
+    return sheetMap.current.get(id)?.instance || undefined
+  }, [])
+
   const value = useMemo(
     () => ({
       appendInstance,
       dropInstance,
       dropAllInstances,
+      getInstance,
     }),
-    [appendInstance, dropInstance, dropAllInstances],
+    [appendInstance, dropInstance, dropAllInstances, getInstance],
   )
 
   return (

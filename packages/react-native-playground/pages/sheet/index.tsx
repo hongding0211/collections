@@ -158,6 +158,34 @@ const ScrollableContent = () => {
   )
 }
 
+const ExpandContent = ({ onPress }: { onPress: () => void }) => {
+  return (
+    <SheetScrollView
+      style={[styles.content, { flex: 1 }]}
+      contentContainerStyle={{ rowGap: 12, paddingBottom: 40 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={styles.sheetTitle}>Sheet Title</Text>
+      <View onTouchEnd={onPress} style={styles.placeholder}>
+        <Text style={styles.placeholderText}>Press or fling up to expand</Text>
+      </View>
+      <Text style={styles.text}>
+        Doloribus est excepturi ex voluptatem debitis sapiente ut. Quas nihil
+        mollitia voluptatibus nihil nisi ut. Vitae dolor et perspiciatis est
+        dolorem voluptas est nostrum ut. Ipsum in adipisci et. Est quia
+        recusandae earum eaque illum. Maiores soluta magni qui perspiciatis.
+        Nihil voluptatem ut dolores dolor ut nisi est officiis dicta iure
+        reiciendis. Ullam quisquam ut fugiat iusto ut aut. Ut explicabo at aut
+        voluptatem. Provident mollitia quis facilis consequatur voluptatem ut.
+        Repudiandae quibusdam minus enim quas voluptatem dolor rerum aut
+        ratione. Ea ipsum suscipit est et quam quos facere est corrupti minus
+        non qui deleniti. Non quo libero numquam sit aut eius ab ullam aut dolor
+        facilis magnam provident quo. Nesciunt omnis eum aliquid qui.
+      </Text>
+    </SheetScrollView>
+  )
+}
+
 export const Sheet: React.FC = () => {
   const sheet = useSheet()
 
@@ -258,6 +286,27 @@ export const Sheet: React.FC = () => {
         })
         break
       }
+      case 9: {
+        const sheetId = sheet.show(
+          () => (
+            <ExpandContent
+              onPress={() => {
+                const instance = sheet.getInstance(sheetId)
+                instance?.expand()
+              }}
+            />
+          ),
+          {
+            type: 'Expandable',
+            expandThreshold: 400,
+            expandTarget: 600,
+            onPressMask: () => {
+              sheet.destroy(sheetId)
+            },
+          },
+        )
+        break
+      }
     }
   }
 
@@ -303,6 +352,7 @@ export const Sheet: React.FC = () => {
             title="Segment with ScrollView"
             onPress={() => handleOpen(7)}
           />
+          <Button title="Expanded Height" onPress={() => handleOpen(9)} />
         </View>
       </View>
 

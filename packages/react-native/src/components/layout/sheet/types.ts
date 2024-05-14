@@ -11,12 +11,15 @@ export interface ISheetContext {
   ) => number
   dropInstance: (id: number) => void
   dropAllInstances: () => void
+  getInstance: (id: number) => SheetInstance | undefined
 }
 
 export interface SheetOptions extends AnimationOptions {
-  type: 'Hug' | 'Segment'
+  type: 'Hug' | 'Segment' | 'Expandable'
   maxHeight: number
   segmentHeightList?: number[]
+  expandThreshold?: number
+  expandTarget?: number
   showMask: boolean
   maskColor: string
   bottomOffset: number
@@ -28,6 +31,7 @@ export type UseSheet = {
   show: (renderFn: React.FC, options?: Partial<SheetOptions>) => number
   destroy: (id: number) => void
   destroyAll: () => void
+  getInstance: (id: number) => SheetInstance | undefined
 }
 
 export interface ISheetProviderProps {
@@ -40,6 +44,7 @@ export interface ISheetProviderProps {
 
 export type SheetInstance = {
   close: () => Promise<any>
+  expand: () => void
 }
 
 export interface ISheetProps {
