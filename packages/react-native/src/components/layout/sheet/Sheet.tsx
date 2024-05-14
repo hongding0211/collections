@@ -77,12 +77,14 @@ export const Sheet: React.FC<ISheetProps> = props => {
     initHeight = options.segmentHeightList?.[0] || 0
   }
 
-  // auto height is disabled when type is Segment
-  //
-  // for Hug type, auto height is always enabled
-  //
-  // for Expandable type, auto height is enabled before height being measured at first time
-  // once init height is measured, we then use container height to control the sheet height
+  /**
+   * auto height is disabled when type is Segment
+   *
+   * for Hug type, auto height is always enabled
+   *
+   * for Expandable type, auto height is enabled before height being measured at first time
+   * once init height is measured, we then use container height to control the sheet height
+   */
   const [useAutoHeight, setUseAutoHeight] = useState(_type !== 'Segment')
 
   /**
@@ -106,13 +108,17 @@ export const Sheet: React.FC<ISheetProps> = props => {
   const { addEventListener, removeEventListener, onEvent } =
     useContextEvents<ISheetInstanceEvents>()
 
-  // start a close anim
-  // notice this only schedule an anim
-  // but won't destroy the sheet instance
+  /**
+   * start a close anim
+   * notice this only schedule an anim
+   * but won't destroy the sheet instance
+   */
   const close = () =>
     new Promise(resolve => {
-      // force using linear anim for mask opacity fade out
-      // spring anim cause lag experience
+      /**
+       * force using linear anim for mask opacity fade out
+       * spring anim causes lag experience
+       */
       startAnim(
         maskOpacity,
         0,
@@ -152,9 +158,11 @@ export const Sheet: React.FC<ISheetProps> = props => {
     const targetHeight =
       options.segmentHeightList?.[currentSegmentIndex.current] || 0
     startAnim(containerHeight, targetHeight, options)
-    // adjust top value manually
-    // layout event is disabled for segment type for better performance
-    // thus the top value won't be updated automatically
+    /**
+     * adjust top value manually
+     * layout event is disabled for segment type for better performance
+     * thus the top value won't be updated automatically
+     */
     const endY = HEIGHT - targetHeight - options.bottomOffset
     startAnim(top, endY, options)
   }, [containerHeight, options, top])
@@ -196,8 +204,10 @@ export const Sheet: React.FC<ISheetProps> = props => {
 
   const handleLayout = useCallback(
     (e: LayoutChangeEvent) => {
-      // layout measure will be skipped in following scenarios
-      // this prevents lag animation and for better performance
+      /**
+       * layout measure will be skipped in following scenarios
+       * this prevents lag animation and for better performance
+       */
       if (_type === 'Segment' && layoutHeight.current !== undefined) {
         return
       }
@@ -215,15 +225,19 @@ export const Sheet: React.FC<ISheetProps> = props => {
         },
       } = e
 
-      // If layout height is not set, set it.
-      // This means the sheet is not shown yet.
-      // In this case, schedule an anim to show the sheet.
+      /**
+       * If layout height is not set, set it.
+       * This means the sheet is not shown yet.
+       * In this case, schedule an anim to show the sheet.
+       */
       if (layoutHeight.current === undefined) {
         firstTimeMeasuredHeight.current = height
 
-        // for Expandable type
-        // based on the init height and expand threshold
-        // we need to decide the correct height to show
+        /**
+         * for Expandable type
+         * based on the init height and expand threshold
+         * we need to decide the correct height to show
+         */
         let _height = height
         if (
           _type === 'Expandable' &&
@@ -240,17 +254,21 @@ export const Sheet: React.FC<ISheetProps> = props => {
         const startY = HEIGHT
         const endY = HEIGHT - _height - options.bottomOffset
 
-        // for Expandable type
-        // once the init height is measured
-        // set the correct container height and disable auto height
-        // this let us fully control the sheet height
+        /**
+         * for Expandable type
+         * once the init height is measured
+         * set the correct container height and disable auto height
+         * this let us fully control the sheet height
+         */
         containerHeight.setValue(_height)
         setUseAutoHeight(false)
 
-        // if type is Expandable
-        // we cannot fire an anim immediately
-        // this is because we use setState to transform container height from 'auto' to 'containerHeight'
-        // instead, we fire this anim in an effect.
+        /**
+         * for Expandable type
+         * we cannot fire an anim immediately
+         * this is because we use setState to change container's height from 'auto' to 'containerHeight'
+         * instead, we should fire this anim in an effect.
+         */
         fireShowAnimFn.current = () => {
           // set sheet and mask visible
           zIndex.setValue(DEFAULT_Z_INDEX + id)
@@ -267,9 +285,11 @@ export const Sheet: React.FC<ISheetProps> = props => {
         layoutHeight.current = height
       }
 
-      // if layout height hasn't changed, do nothing
-      // layout height might be not precise
-      // thus use Math.abs to compare
+      /**
+       * if layout height hasn't changed, do nothing
+       * notice that layout height might be not precise
+       * thus use Math.abs to compare
+       */
       if (Math.abs(height - layoutHeight.current) < 1) {
         return
       }
@@ -284,17 +304,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
         layoutHeight.current = height
       }
     },
-    [
-      _type,
-      layoutHeight,
-      options,
-      id,
-      maskOpacity,
-      maskZIndex,
-      top,
-      opacity,
-      zIndex,
-    ],
+    [_type, options, id, onEvent],
   )
 
   /**
@@ -329,7 +339,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
     ) {
       onEvent('onReadyEnableScrollView')
     }
-  }, [])
+  }, [_type, onEvent, options])
 
   useEffect(() => {
     if (_type === 'Expandable' && useAutoHeight === false) {
