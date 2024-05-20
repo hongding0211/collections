@@ -217,11 +217,7 @@ const KeyboardAvoidingScrollViewContent = () => {
   const { focusElem } = keyboardAvoidingScrollViewContext || {}
 
   return (
-    <SheetScrollView
-      style={[styles.content, { flex: 1 }]}
-      contentContainerStyle={{ rowGap: 12 }}
-      showsVerticalScrollIndicator={false}
-    >
+    <View style={[styles.content, { rowGap: 12, height: '100%' }]}>
       <Text style={styles.sheetTitle}>Sheet Title</Text>
       <Text style={styles.text}>
         Doloribus est excepturi ex voluptatem debitis sapiente ut. Quas nihil
@@ -229,7 +225,8 @@ const KeyboardAvoidingScrollViewContent = () => {
         dolorem voluptas est nostrum ut. Ipsum in adipisci et. Est quia
         recusandae earum eaque illum. Maiores soluta magni qui perspiciatis.
         Nihil voluptatem ut dolores dolor ut nisi est officiis dicta iure
-        reiciendis.
+        reiciendis. Ullam quisquam ut fugiat iusto ut aut. Ut explicabo at aut
+        voluptatem. Provident mollitia quis facilis consequatur voluptatem ut.
       </Text>
       <View style={styles.placeholder}>
         <Text style={styles.placeholderText}>Placerholder</Text>
@@ -241,7 +238,7 @@ const KeyboardAvoidingScrollViewContent = () => {
           placeholder="Try to focus this input"
         />
       </View>
-    </SheetScrollView>
+    </View>
   )
 }
 
@@ -377,6 +374,9 @@ export const Sheet: React.FC = () => {
             </KeyboardAvoidingScrollView>
           ),
           {
+            type: 'Expandable',
+            expandThreshold: 400,
+            expandTarget: 600,
             onPressMask: () => {
               sheet.destroy(sheetId)
             },
