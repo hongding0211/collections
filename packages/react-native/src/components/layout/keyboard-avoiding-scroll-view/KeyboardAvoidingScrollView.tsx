@@ -12,7 +12,7 @@ import {
   Keyboard,
   LayoutChangeEvent,
   Platform,
-  ScrollView,
+  ScrollView as RNScrollView,
   ScrollViewProps,
 } from 'react-native'
 
@@ -28,6 +28,9 @@ export const KeyboardAvoidingScrollViewContext = createContext<
 interface IKeyboardAvoidingScrollView extends ScrollViewProps {
   bottomOffset?: number
   enable?: boolean
+  renderScrollComponent?:
+    | React.ComponentType<ScrollViewProps>
+    | React.FC<ScrollViewProps>
 }
 
 export const KeyboardAvoidingScrollView: React.FC<
@@ -40,10 +43,13 @@ export const KeyboardAvoidingScrollView: React.FC<
     children,
     enable = true,
     onScroll,
+    renderScrollComponent,
     ...rest
   } = props
 
-  const scrollViewRef = useRef<ScrollView>(null)
+  const ScrollView = renderScrollComponent || RNScrollView
+
+  const scrollViewRef = useRef<RNScrollView>(null)
 
   const containerHeight = useRef<number | undefined>(undefined)
   const scrollPosY = useRef<number>(0)
@@ -133,6 +139,7 @@ export const KeyboardAvoidingScrollView: React.FC<
     <KeyboardAvoidingScrollViewContext.Provider value={contextValue}>
       <ScrollView
         {...rest}
+        // @ts-ignore
         ref={scrollViewRef}
         keyboardShouldPersistTaps={keyboardShouldPersistTaps}
         keyboardDismissMode={keyboardDismissMode}

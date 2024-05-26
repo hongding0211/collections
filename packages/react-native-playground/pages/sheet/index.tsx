@@ -1,6 +1,18 @@
-import { SheetScrollView, useSheet } from '@hong97/collections-react-native'
-import React, { useRef, useState } from 'react'
-import { Pressable, PressableProps, StyleSheet, Text, View } from 'react-native'
+import {
+  KeyboardAvoidingScrollView,
+  KeyboardAvoidingScrollViewContext,
+  SheetScrollView,
+  useSheet,
+} from '@hong97/collections-react-native'
+import React, { useContext, useRef, useState } from 'react'
+import {
+  Pressable,
+  PressableProps,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native'
 
 const styles = StyleSheet.create({
   container: {
@@ -82,6 +94,16 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     color: '#5a5a5a',
   },
+  textInputContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 4,
+    height: 100,
+    padding: 10,
+  },
+  textInput: {
+    fontSize: 14,
+    color: '#333',
+  },
 })
 
 const Button: React.FC<
@@ -155,6 +177,68 @@ const ScrollableContent = () => {
         facilis magnam provident quo. Nesciunt omnis eum aliquid qui.
       </Text>
     </SheetScrollView>
+  )
+}
+
+const ExpandContent = ({ onPress }: { onPress: () => void }) => {
+  return (
+    <SheetScrollView
+      style={[styles.content, { flex: 1 }]}
+      contentContainerStyle={{ rowGap: 12, paddingBottom: 40 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={styles.sheetTitle}>Sheet Title</Text>
+      <View onTouchEnd={onPress} style={styles.placeholder}>
+        <Text style={styles.placeholderText}>Press or fling up to expand</Text>
+      </View>
+      <Text style={styles.text}>
+        Doloribus est excepturi ex voluptatem debitis sapiente ut. Quas nihil
+        mollitia voluptatibus nihil nisi ut. Vitae dolor et perspiciatis est
+        dolorem voluptas est nostrum ut. Ipsum in adipisci et. Est quia
+        recusandae earum eaque illum. Maiores soluta magni qui perspiciatis.
+        Nihil voluptatem ut dolores dolor ut nisi est officiis dicta iure
+        reiciendis. Ullam quisquam ut fugiat iusto ut aut. Ut explicabo at aut
+        voluptatem. Provident mollitia quis facilis consequatur voluptatem ut.
+        Repudiandae quibusdam minus enim quas voluptatem dolor rerum aut
+        ratione. Ea ipsum suscipit est et quam quos facere est corrupti minus
+        non qui deleniti. Non quo libero numquam sit aut eius ab ullam aut dolor
+        facilis magnam provident quo. Nesciunt omnis eum aliquid qui.
+      </Text>
+    </SheetScrollView>
+  )
+}
+
+const KeyboardAvoidingScrollViewContent = () => {
+  const inputRef = useRef<TextInput>(null)
+
+  const keyboardAvoidingScrollViewContext = useContext(
+    KeyboardAvoidingScrollViewContext,
+  )
+  const { focusElem } = keyboardAvoidingScrollViewContext || {}
+
+  return (
+    <View style={[styles.content, { rowGap: 12, height: '100%' }]}>
+      <Text style={styles.sheetTitle}>Sheet Title</Text>
+      <Text style={styles.text}>
+        Doloribus est excepturi ex voluptatem debitis sapiente ut. Quas nihil
+        mollitia voluptatibus nihil nisi ut. Vitae dolor et perspiciatis est
+        dolorem voluptas est nostrum ut. Ipsum in adipisci et. Est quia
+        recusandae earum eaque illum. Maiores soluta magni qui perspiciatis.
+        Nihil voluptatem ut dolores dolor ut nisi est officiis dicta iure
+        reiciendis. Ullam quisquam ut fugiat iusto ut aut. Ut explicabo at aut
+        voluptatem. Provident mollitia quis facilis consequatur voluptatem ut.
+      </Text>
+      <View style={styles.placeholder}>
+        <Text style={styles.placeholderText}>Placerholder</Text>
+      </View>
+      <View ref={inputRef} style={styles.textInputContainer}>
+        <TextInput
+          style={styles.textInput}
+          onFocus={() => focusElem?.(inputRef.current)}
+          placeholder="Try to focus this input"
+        />
+      </View>
+    </View>
   )
 }
 
@@ -258,6 +342,48 @@ export const Sheet: React.FC = () => {
         })
         break
       }
+      case 9: {
+        const sheetId = sheet.show(
+          () => (
+            <ExpandContent
+              onPress={() => {
+                const instance = sheet.getInstance(sheetId)
+                instance?.expand()
+              }}
+            />
+          ),
+          {
+            type: 'Expandable',
+            expandThreshold: 400,
+            expandTarget: 600,
+            onPressMask: () => {
+              sheet.destroy(sheetId)
+            },
+          },
+        )
+        break
+      }
+      case 10: {
+        const sheetId = sheet.show(
+          () => (
+            <KeyboardAvoidingScrollView
+              bottomOffset={12}
+              renderScrollComponent={SheetScrollView}
+            >
+              <KeyboardAvoidingScrollViewContent />
+            </KeyboardAvoidingScrollView>
+          ),
+          {
+            type: 'Expandable',
+            expandThreshold: 400,
+            expandTarget: 600,
+            onPressMask: () => {
+              sheet.destroy(sheetId)
+            },
+          },
+        )
+        break
+      }
     }
   }
 
@@ -303,6 +429,7 @@ export const Sheet: React.FC = () => {
             title="Segment with ScrollView"
             onPress={() => handleOpen(7)}
           />
+          <Button title="Expanded Height" onPress={() => handleOpen(9)} />
         </View>
       </View>
 
@@ -311,6 +438,14 @@ export const Sheet: React.FC = () => {
         <Text style={styles.rowSubtitle}>Using gesture to manipulate.</Text>
         <View style={styles.row}>
           <Button title="Fling to Close" onPress={() => handleOpen(4)} />
+        </View>
+      </View>
+
+      <View>
+        <Text style={styles.rowTitle}>Advanced Usage</Text>
+        <Text style={styles.rowSubtitle}>Sheet with advanced usage.</Text>
+        <View style={styles.row}>
+          <Button title="Custom ScrollView" onPress={() => handleOpen(10)} />
         </View>
       </View>
     </View>

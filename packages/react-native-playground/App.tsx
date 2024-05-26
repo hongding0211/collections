@@ -1,4 +1,4 @@
-import { SheetProvider } from '@hong97/collections-react-native'
+import { PortalProvider } from '@hong97/collections-react-native/src/components/core'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { NavigationContainer } from '@react-navigation/native'
 import React from 'react'
@@ -10,7 +10,7 @@ const Drawer = createDrawerNavigator()
 
 export default function App() {
   return (
-    <SheetProvider>
+    <PortalProvider>
       <NavigationContainer>
         <Drawer.Navigator>
           <Drawer.Screen name="Sheet" component={Sheet} />
@@ -20,6 +20,6 @@ export default function App() {
           />
         </Drawer.Navigator>
       </NavigationContainer>
-    </SheetProvider>
+    </PortalProvider>
   )
 }

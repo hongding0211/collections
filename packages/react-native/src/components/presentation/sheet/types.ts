@@ -2,21 +2,14 @@ import { ContextEventsValue } from '@hong97/collections-react'
 import React from 'react'
 import { ScrollViewProps } from 'react-native'
 
-import { AnimationOptions } from '../../../utils'
+import { IPortalInstance, PortalOptions } from '../../core'
 
-export interface ISheetContext {
-  appendInstance: (
-    renderFn: React.FC,
-    options?: Partial<SheetOptions>,
-  ) => number
-  dropInstance: (id: number) => void
-  dropAllInstances: () => void
-}
-
-export interface SheetOptions extends AnimationOptions {
-  type: 'Hug' | 'Segment'
+export interface SheetOptions extends PortalOptions {
+  type: 'Hug' | 'Segment' | 'Expandable'
   maxHeight: number
   segmentHeightList?: number[]
+  expandThreshold?: number
+  expandTarget?: number
   showMask: boolean
   maskColor: string
   bottomOffset: number
@@ -27,26 +20,18 @@ export interface SheetOptions extends AnimationOptions {
 export type UseSheet = {
   show: (renderFn: React.FC, options?: Partial<SheetOptions>) => number
   destroy: (id: number) => void
-  destroyAll: () => void
+  getInstance: (id: number) => ISheetInstance | undefined
 }
 
-export interface ISheetProviderProps {
-  children: React.ReactNode
-  /**
-   * Only allow one instance of sheet to be shown at a time.
-   */
-  monoInstance?: boolean
-}
-
-export type SheetInstance = {
-  close: () => Promise<any>
+export interface ISheetInstance extends IPortalInstance {
+  expand: () => void
 }
 
 export interface ISheetProps {
   children: React.ReactNode
   id: number
   options: SheetOptions
-  getInstance?: (instance: SheetInstance) => void
+  getInstance?: (instance: ISheetInstance) => void
   onPressMask?: () => void
   onFlingClose?: () => void
 }

@@ -1,16 +1,15 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
-import { Sheet } from './Sheet'
-import { SheetContext } from './SheetContext'
-import { DEFAULT_SHEET_OPTIONS } from './constants'
-import { ISheetProviderProps, SheetInstance, SheetOptions } from './types'
+import { PortalContext } from './PortalContext'
+import { DEFAULT_PORTAL_OPTIONS } from './constants'
+import { IPortalInstance, IPortalProviderProps, PortalOptions } from './types'
 
-export const SheetProvider: React.FC<ISheetProviderProps> = props => {
-  const { children, monoInstance = false } = props
+export const PortalProvider: React.FC<IPortalProviderProps> = props => {
+  const { children } = props
 
   /**
-   * An auto-increment counter to generate unique id for each sheet instance.
+   * An auto-increment counter to generate unique id for each portal instance.
    */
   const _cnt = useRef(0)
 
@@ -23,47 +22,47 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
    *
    * Consider the following scenario:
    *
-   * When a user invokes a show method to append a new sheet instance,
+   * When a user invokes a show method to append a new portal instance,
    * you may pass some callbacks in the options,
-   * such as destroying the sheet in the onPressMask callback.
+   * such as destroying the portal in the onPressMask callback.
    *
    * The problem occurs here:
    * This callback captures a closure which is the state before the instance has been actually created,
    * where at this moment, the instance list has not been updated yet (does not include the instance you're about to create).
    *
-   * Thus, when you try to destroy a sheet instance,
+   * Thus, when you try to destroy a portal instance,
    * dropInstance() will not be able to find the instance you just created.
    *
    * Therefore, to solve this problem, we use a ref to store all the instances.
    * Then we use setRenderCnt to manually trigger a re-render when it's necessary.
    */
   const [, setRenderCnt] = useState(0)
-  const sheetMap = useRef<
+  const instanceMap = useRef<
     Map<
       number,
       {
         id: number
         renderInstance: React.ReactElement
-        options: SheetOptions
-        instance?: SheetInstance
+        options: PortalOptions
+        instance?: IPortalInstance
       }
     >
   >(new Map())
 
   const appendInstance = useCallback(
-    (renderFn: React.FC, options?: Partial<SheetOptions>) => {
+    (renderFn: React.FC<{ id: number }>, options?: Partial<PortalOptions>) => {
       const id = _cnt.current++
       const _options = options
         ? {
-            ...DEFAULT_SHEET_OPTIONS,
+            ...DEFAULT_PORTAL_OPTIONS,
             ...options,
           }
-        : DEFAULT_SHEET_OPTIONS
-      const renderInstance = React.createElement(renderFn)
-      if (monoInstance) {
-        sheetMap.current.clear()
-      }
-      sheetMap.current.set(id, {
+        : DEFAULT_PORTAL_OPTIONS
+      const renderInstance = React.createElement(renderFn, {
+        key: id,
+        id,
+      })
+      instanceMap.current.set(id, {
         id,
         renderInstance,
         options: _options,
@@ -71,32 +70,43 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
       setRenderCnt(r => r + 1)
       return id
     },
-    [monoInstance],
+    [],
   )
 
   const dropInstance = useCallback((id: number) => {
-    if (!sheetMap.current.has(id)) {
+    if (!instanceMap.current.has(id)) {
       return
     }
-    const sheet = sheetMap.current.get(id)!
+    const portal = instanceMap.current.get(id)!
     /**
-     * if useAnim is enabled, then close the sheet using exploded instance,
+     * if useAnim is enabled, then close the portal using exploded instance,
      * otherwise just drop its instance.
      */
-    if (sheet.options.useAnim) {
-      sheet.instance?.close().then(() => {
-        sheetMap.current.delete(id)
+    if (portal.options.useAnim) {
+      portal.instance?.close().then(() => {
+        instanceMap.current.delete(id)
         setRenderCnt(r => r + 1)
       })
     } else {
-      sheetMap.current.delete(id)
+      instanceMap.current.delete(id)
       setRenderCnt(r => r + 1)
     }
   }, [])
 
   const dropAllInstances = useCallback(() => {
-    sheetMap.current.clear()
+    instanceMap.current.clear()
     setRenderCnt(r => r + 1)
+  }, [])
+
+  const getInstance = useCallback((id: number) => {
+    return instanceMap.current.get(id)?.instance || undefined
+  }, [])
+
+  const setInstance = useCallback((id: number, instance: IPortalInstance) => {
+    if (!instanceMap.current.has(id)) {
+      return
+    }
+    instanceMap.current.get(id)!.instance = instance
   }, [])
 
   const value = useMemo(
@@ -104,29 +114,18 @@ export const SheetProvider: React.FC<ISheetProviderProps> = props => {
       appendInstance,
       dropInstance,
       dropAllInstances,
+      getInstance,
+      setInstance,
     }),
-    [appendInstance, dropInstance, dropAllInstances],
+    [appendInstance, dropInstance, dropAllInstances, getInstance, setInstance],
   )
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SheetContext.Provider value={value}>
-        {[...sheetMap.current.values()].map(i => (
-          <Sheet
-            key={i.id}
-            id={i.id}
-            options={i.options}
-            onPressMask={i.options.onPressMask}
-            onFlingClose={i.options.onFlingClose}
-            getInstance={instance =>
-              (sheetMap.current.get(i.id)!.instance = instance)
-            }
-          >
-            {i.renderInstance}
-          </Sheet>
-        ))}
+      <PortalContext.Provider value={value}>
+        {[...instanceMap.current.values()].map(e => e.renderInstance)}
         {children}
-      </SheetContext.Provider>
+      </PortalContext.Provider>
     </GestureHandlerRootView>
   )
 }

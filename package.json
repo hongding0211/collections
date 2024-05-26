@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "rn-playground": "lerna run start --scope=@hong97/collections-react-native-playground",
-    "build": "lerna run build --scope=@hong97/collections-{utils,react,react-native}",
+    "rn-playground": "pnpm run -filter @hong97/collections-react-native-playground start",
+    "build-all": "pnpm run --filter @hong97/collections-* build",
     "prepare": "husky"
   },
   "keywords": [],
   "author": "HongDing",
   "license": "ISC",
   "devDependencies": {
+    "@changesets/cli": "^2.27.1",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
@@ -24,7 +25,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-native": "^4.1.0",
     "husky": "^9.0.11",
-    "lerna": "^8.1.2",
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "tsc-files": "^1.1.4",
