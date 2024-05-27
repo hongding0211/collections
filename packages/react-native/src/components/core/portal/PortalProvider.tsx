@@ -2,8 +2,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import { PortalContext } from './PortalContext'
-import { DEFAULT_PORTAL_OPTIONS } from './constants'
-import { IPortalInstance, IPortalProviderProps, PortalOptions } from './types'
+import { IPortalInstance, IPortalProviderProps } from './types'
 
 export const PortalProvider: React.FC<IPortalProviderProps> = props => {
   const { children } = props
@@ -43,54 +42,31 @@ export const PortalProvider: React.FC<IPortalProviderProps> = props => {
       {
         id: number
         renderInstance: React.ReactElement
-        options: PortalOptions
-        instance?: IPortalInstance
+        instance?: any
       }
     >
   >(new Map())
 
-  const appendInstance = useCallback(
-    (renderFn: React.FC<{ id: number }>, options?: Partial<PortalOptions>) => {
-      const id = _cnt.current++
-      const _options = options
-        ? {
-            ...DEFAULT_PORTAL_OPTIONS,
-            ...options,
-          }
-        : DEFAULT_PORTAL_OPTIONS
-      const renderInstance = React.createElement(renderFn, {
-        key: id,
-        id,
-      })
-      instanceMap.current.set(id, {
-        id,
-        renderInstance,
-        options: _options,
-      })
-      setRenderCnt(r => r + 1)
-      return id
-    },
-    [],
-  )
+  const appendInstance = useCallback((renderFn: React.FC<{ id: number }>) => {
+    const id = _cnt.current++
+    const renderInstance = React.createElement(renderFn, {
+      key: id,
+      id,
+    })
+    instanceMap.current.set(id, {
+      id,
+      renderInstance,
+    })
+    setRenderCnt(r => r + 1)
+    return id
+  }, [])
 
   const dropInstance = useCallback((id: number) => {
     if (!instanceMap.current.has(id)) {
       return
     }
-    const portal = instanceMap.current.get(id)!
-    /**
-     * if useAnim is enabled, then close the portal using exploded instance,
-     * otherwise just drop its instance.
-     */
-    if (portal.options.useAnim) {
-      portal.instance?.close().then(() => {
-        instanceMap.current.delete(id)
-        setRenderCnt(r => r + 1)
-      })
-    } else {
-      instanceMap.current.delete(id)
-      setRenderCnt(r => r + 1)
-    }
+    instanceMap.current.delete(id)
+    setRenderCnt(r => r + 1)
   }, [])
 
   const dropAllInstances = useCallback(() => {

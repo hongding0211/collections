@@ -134,25 +134,30 @@ export const Sheet: React.FC<ISheetProps> = props => {
       startAnim(top, HEIGHT, options, resolve)
     })
 
-  const expand = () => {
-    if (
-      !options.expandThreshold ||
-      expanded.current ||
-      !options.expandTarget ||
-      !layoutHeight.current
-    ) {
-      return
-    }
-    if (firstTimeMeasuredHeight.current > options.expandThreshold) {
-      const targetHeight = options.expandTarget
-      const endY = HEIGHT - targetHeight - options.bottomOffset
-      onEvent('onReadyEnableScrollView')
-      startAnim(top, endY, options)
-      startAnim(containerHeight, targetHeight, options, () => {
-        expanded.current = true
-      })
-    }
-  }
+  const expand = useCallback(
+    () => {
+      if (
+        !options.expandThreshold ||
+        expanded.current ||
+        !options.expandTarget ||
+        !layoutHeight.current
+      ) {
+        return
+      }
+      if (firstTimeMeasuredHeight.current > options.expandThreshold) {
+        const targetHeight = options.expandTarget
+        const endY = HEIGHT - targetHeight - options.bottomOffset
+        onEvent('onReadyEnableScrollView')
+        startAnim(top, endY, options)
+        startAnim(containerHeight, targetHeight, options, () => {
+          expanded.current = true
+        })
+      }
+    },
+    // rest all all anim refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [options, onEvent],
+  )
 
   const handleSegmentChange = useCallback(() => {
     const targetHeight =
@@ -167,31 +172,36 @@ export const Sheet: React.FC<ISheetProps> = props => {
     startAnim(top, endY, options)
   }, [containerHeight, options, top])
 
-  const handleFlingUp = useCallback(() => {
-    switch (_type) {
-      case 'Segment': {
-        if (!options.segmentHeightList?.length || !containerHeight) {
-          return
+  const handleFlingUp = useCallback(
+    () => {
+      switch (_type) {
+        case 'Segment': {
+          if (!options.segmentHeightList?.length || !containerHeight) {
+            return
+          }
+          currentSegmentIndex.current = Math.min(
+            options.segmentHeightList.length - 1,
+            currentSegmentIndex.current + 1,
+          )
+          if (
+            currentSegmentIndex.current ===
+            options.segmentHeightList.length - 1
+          ) {
+            onEvent('onReadyEnableScrollView')
+          }
+          handleSegmentChange()
+          break
         }
-        currentSegmentIndex.current = Math.min(
-          options.segmentHeightList.length - 1,
-          currentSegmentIndex.current + 1,
-        )
-        if (
-          currentSegmentIndex.current ===
-          options.segmentHeightList.length - 1
-        ) {
-          onEvent('onReadyEnableScrollView')
+        case 'Expandable': {
+          expand()
+          break
         }
-        handleSegmentChange()
-        break
       }
-      case 'Expandable': {
-        expand()
-        break
-      }
-    }
-  }, [_type, options, handleSegmentChange, onEvent])
+    },
+    // rest all all anim refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [_type, options, handleSegmentChange, onEvent, expand],
+  )
 
   const handleFlingDown = useCallback(() => {
     if (currentSegmentIndex.current === 0) {
@@ -304,6 +314,8 @@ export const Sheet: React.FC<ISheetProps> = props => {
         layoutHeight.current = height
       }
     },
+    // rest all all anim refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [_type, options, id, onEvent],
   )
 
@@ -330,6 +342,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
   getInstance?.({
     close,
     expand,
+    options,
   })
 
   useEffect(() => {

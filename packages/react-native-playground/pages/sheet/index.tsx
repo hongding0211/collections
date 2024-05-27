@@ -254,7 +254,7 @@ export const Sheet: React.FC = () => {
       case 0: {
         const sheetId = sheet.show(Content, {
           onPressMask: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
         })
         break
@@ -263,14 +263,14 @@ export const Sheet: React.FC = () => {
         const sheetId = sheet.show(Content, {
           useAnim: false,
           onPressMask: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
         })
         break
       }
       case 2: {
         if (type2SheetOnend) {
-          sheet.destroy(type2SheetId.current)
+          sheet.close(type2SheetId.current)
           setType2SheetOpened(false)
         } else {
           type2SheetId.current = sheet.show(Content, {
@@ -284,7 +284,7 @@ export const Sheet: React.FC = () => {
         const sheetId = sheet.show(Content, {
           useLinearAnim: true,
           onPressMask: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
         })
         break
@@ -292,7 +292,7 @@ export const Sheet: React.FC = () => {
       case 4: {
         const sheetId = sheet.show(Content, {
           onFlingClose: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
         })
         break
@@ -302,10 +302,10 @@ export const Sheet: React.FC = () => {
           type: 'Segment',
           segmentHeightList: [400, 550, 700],
           onFlingClose: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
           onPressMask: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
         })
         break
@@ -315,7 +315,7 @@ export const Sheet: React.FC = () => {
           type: 'Segment',
           segmentHeightList: [500],
           onPressMask: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
         })
         break
@@ -325,7 +325,7 @@ export const Sheet: React.FC = () => {
           type: 'Segment',
           segmentHeightList: [400, 600],
           onPressMask: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
         })
         break
@@ -333,7 +333,7 @@ export const Sheet: React.FC = () => {
       case 8: {
         const sheetId = sheet.show(Content, {
           onPressMask: () => {
-            sheet.destroy(sheetId)
+            sheet.close(sheetId)
           },
           springConfig: {
             bounciness: 6,
@@ -357,7 +357,7 @@ export const Sheet: React.FC = () => {
             expandThreshold: 400,
             expandTarget: 600,
             onPressMask: () => {
-              sheet.destroy(sheetId)
+              sheet.close(sheetId)
             },
           },
         )
@@ -378,7 +378,7 @@ export const Sheet: React.FC = () => {
             expandThreshold: 400,
             expandTarget: 600,
             onPressMask: () => {
-              sheet.destroy(sheetId)
+              sheet.close(sheetId)
             },
           },
         )

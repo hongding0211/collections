@@ -10,13 +10,6 @@ export const DEFAULT_SHEET_OPTIONS: SheetOptions = {
   ...DEFAULT_ANIMATION_OPTIONS,
 }
 
-export const DEFAULT_CONTEXT = {
-  appendInstance: () => -1,
-  dropInstance: () => null,
-  dropAllInstances: () => null,
-  getInstance: () => undefined,
-}
-
 export const DEFAULT_SHEET_INSTANCE_CONTEXT: ISheetInstanceContext = {
   addEventListener: () => null,
   removeEventListener: () => null,
