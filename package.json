@@ -6,6 +6,7 @@
   "scripts": {
     "start:rn-playground": "pnpm run -filter @hong97/collections-react-native-playground start",
     "build:all": "pnpm run --filter @hong97/collections-* build",
+    "changeset": "changeset",
     "prepare": "husky"
   },
   "keywords": [],
