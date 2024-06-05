@@ -7,17 +7,13 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import {
-  Animated,
-  Dimensions,
-  LayoutChangeEvent,
-  StyleSheet,
-} from 'react-native'
+import { Dimensions, LayoutChangeEvent, StyleSheet } from 'react-native'
 import {
   Directions,
   Gesture,
   GestureDetector,
 } from 'react-native-gesture-handler'
+import Animated, { useSharedValue } from 'react-native-reanimated'
 
 import { startAnim } from '../../../utils'
 import { DEFAULT_SHEET_INSTANCE_CONTEXT } from './constants'
@@ -98,12 +94,12 @@ export const Sheet: React.FC<ISheetProps> = props => {
   /**
    * Anim Refs
    */
-  const zIndex = useRef(new Animated.Value(-1)).current
-  const opacity = useRef(new Animated.Value(0)).current
-  const top = useRef(new Animated.Value(0)).current
-  const maskZIndex = useRef(new Animated.Value(-1)).current
-  const maskOpacity = useRef(new Animated.Value(0)).current
-  const containerHeight = useRef(new Animated.Value(initHeight)).current
+  const zIndex = useSharedValue(-1)
+  const opacity = useSharedValue(0)
+  const top = useSharedValue(0)
+  const maskZIndex = useSharedValue(-1)
+  const maskOpacity = useSharedValue(0)
+  const containerHeight = useSharedValue(initHeight)
 
   const { addEventListener, removeEventListener, onEvent } =
     useContextEvents<ISheetInstanceEvents>()
@@ -128,10 +124,10 @@ export const Sheet: React.FC<ISheetProps> = props => {
           animationDuration: options.animationDuration / 2,
         },
         () => {
-          maskZIndex.setValue(-1)
+          maskZIndex.value = -1
         },
       )
-      startAnim(top, HEIGHT, options, resolve)
+      startAnim(top, HEIGHT, options, () => resolve(void 0))
     })
 
   const expand = useCallback(
@@ -270,7 +266,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
          * set the correct container height and disable auto height
          * this let us fully control the sheet height
          */
-        containerHeight.setValue(_height)
+        containerHeight.value = _height
         setUseAutoHeight(false)
 
         /**
@@ -281,11 +277,11 @@ export const Sheet: React.FC<ISheetProps> = props => {
          */
         fireShowAnimFn.current = () => {
           // set sheet and mask visible
-          zIndex.setValue(DEFAULT_Z_INDEX + id)
-          opacity.setValue(1)
-          maskZIndex.setValue(DEFAULT_Z_INDEX + id)
+          zIndex.value = DEFAULT_Z_INDEX + id
+          opacity.value = 1
+          maskZIndex.value = DEFAULT_Z_INDEX + id
           startAnim(maskOpacity, 1, options)
-          top.setValue(startY)
+          top.value = startY
           startAnim(top, endY, options)
         }
         if (_type !== 'Expandable') {
@@ -310,7 +306,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
         Math.abs(height - layoutHeight.current) > 1
       ) {
         const endY = HEIGHT - height - options.bottomOffset
-        top.setValue(endY)
+        top.value = endY
         layoutHeight.current = height
       }
     },

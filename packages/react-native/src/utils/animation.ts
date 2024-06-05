@@ -1,29 +1,36 @@
-import { Animated } from 'react-native'
+import {
+  SharedValue,
+  runOnJS,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated'
 
 import { AnimationOptions } from './types'
 
 export function startAnim(
-  anim: Animated.Value,
+  anim: SharedValue<number>,
   toValue: number,
   options: AnimationOptions,
-  onFinish?: (...args: any) => any,
+  onFinish: () => void = () => undefined,
 ) {
   if (options.useAnim && options.useLinearAnim) {
-    Animated.timing(anim, {
+    anim.value = withTiming(
       toValue,
-      duration: options.animationDuration,
-      useNativeDriver: false,
-    }).start(onFinish)
+      {
+        duration: options.animationDuration,
+      },
+      () => {
+        runOnJS(onFinish)()
+      },
+    )
   }
   if (options.useAnim && !options.useLinearAnim) {
-    Animated.spring(anim, {
-      toValue,
-      useNativeDriver: false,
-      ...options.springConfig,
-    }).start(onFinish)
+    anim.value = withSpring(toValue, options.springConfig, () => {
+      runOnJS(onFinish)()
+    })
   }
   if (!options.useAnim) {
-    anim.setValue(toValue)
-    onFinish?.()
+    anim.value = toValue
+    runOnJS(onFinish)()
   }
 }
