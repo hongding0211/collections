@@ -7,17 +7,13 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import {
-  Animated,
-  Dimensions,
-  LayoutChangeEvent,
-  StyleSheet,
-} from 'react-native'
+import { Dimensions, LayoutChangeEvent, StyleSheet } from 'react-native'
 import {
   Directions,
   Gesture,
   GestureDetector,
 } from 'react-native-gesture-handler'
+import Animated, { useSharedValue } from 'react-native-reanimated'
 
 import { startAnim } from '../../../utils'
 import { DEFAULT_SHEET_INSTANCE_CONTEXT } from './constants'
@@ -98,12 +94,12 @@ export const Sheet: React.FC<ISheetProps> = props => {
   /**
    * Anim Refs
    */
-  const zIndex = useRef(new Animated.Value(-1)).current
-  const opacity = useRef(new Animated.Value(0)).current
-  const top = useRef(new Animated.Value(0)).current
-  const maskZIndex = useRef(new Animated.Value(-1)).current
-  const maskOpacity = useRef(new Animated.Value(0)).current
-  const containerHeight = useRef(new Animated.Value(initHeight)).current
+  const zIndex = useSharedValue(-1)
+  const opacity = useSharedValue(0)
+  const top = useSharedValue(0)
+  const maskZIndex = useSharedValue(-1)
+  const maskOpacity = useSharedValue(0)
+  const containerHeight = useSharedValue(initHeight)
 
   const { addEventListener, removeEventListener, onEvent } =
     useContextEvents<ISheetInstanceEvents>()
@@ -128,31 +124,36 @@ export const Sheet: React.FC<ISheetProps> = props => {
           animationDuration: options.animationDuration / 2,
         },
         () => {
-          maskZIndex.setValue(-1)
+          maskZIndex.value = -1
         },
       )
-      startAnim(top, HEIGHT, options, resolve)
+      startAnim(top, HEIGHT, options, () => resolve(void 0))
     })
 
-  const expand = () => {
-    if (
-      !options.expandThreshold ||
-      expanded.current ||
-      !options.expandTarget ||
-      !layoutHeight.current
-    ) {
-      return
-    }
-    if (firstTimeMeasuredHeight.current > options.expandThreshold) {
-      const targetHeight = options.expandTarget
-      const endY = HEIGHT - targetHeight - options.bottomOffset
-      onEvent('onReadyEnableScrollView')
-      startAnim(top, endY, options)
-      startAnim(containerHeight, targetHeight, options, () => {
-        expanded.current = true
-      })
-    }
-  }
+  const expand = useCallback(
+    () => {
+      if (
+        !options.expandThreshold ||
+        expanded.current ||
+        !options.expandTarget ||
+        !layoutHeight.current
+      ) {
+        return
+      }
+      if (firstTimeMeasuredHeight.current > options.expandThreshold) {
+        const targetHeight = options.expandTarget
+        const endY = HEIGHT - targetHeight - options.bottomOffset
+        onEvent('onReadyEnableScrollView')
+        startAnim(top, endY, options)
+        startAnim(containerHeight, targetHeight, options, () => {
+          expanded.current = true
+        })
+      }
+    },
+    // rest all all anim refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [options, onEvent],
+  )
 
   const handleSegmentChange = useCallback(() => {
     const targetHeight =
@@ -167,31 +168,36 @@ export const Sheet: React.FC<ISheetProps> = props => {
     startAnim(top, endY, options)
   }, [containerHeight, options, top])
 
-  const handleFlingUp = useCallback(() => {
-    switch (_type) {
-      case 'Segment': {
-        if (!options.segmentHeightList?.length || !containerHeight) {
-          return
+  const handleFlingUp = useCallback(
+    () => {
+      switch (_type) {
+        case 'Segment': {
+          if (!options.segmentHeightList?.length || !containerHeight) {
+            return
+          }
+          currentSegmentIndex.current = Math.min(
+            options.segmentHeightList.length - 1,
+            currentSegmentIndex.current + 1,
+          )
+          if (
+            currentSegmentIndex.current ===
+            options.segmentHeightList.length - 1
+          ) {
+            onEvent('onReadyEnableScrollView')
+          }
+          handleSegmentChange()
+          break
         }
-        currentSegmentIndex.current = Math.min(
-          options.segmentHeightList.length - 1,
-          currentSegmentIndex.current + 1,
-        )
-        if (
-          currentSegmentIndex.current ===
-          options.segmentHeightList.length - 1
-        ) {
-          onEvent('onReadyEnableScrollView')
+        case 'Expandable': {
+          expand()
+          break
         }
-        handleSegmentChange()
-        break
       }
-      case 'Expandable': {
-        expand()
-        break
-      }
-    }
-  }, [_type, options, handleSegmentChange, onEvent])
+    },
+    // rest all all anim refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [_type, options, handleSegmentChange, onEvent, expand],
+  )
 
   const handleFlingDown = useCallback(() => {
     if (currentSegmentIndex.current === 0) {
@@ -260,7 +266,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
          * set the correct container height and disable auto height
          * this let us fully control the sheet height
          */
-        containerHeight.setValue(_height)
+        containerHeight.value = _height
         setUseAutoHeight(false)
 
         /**
@@ -271,11 +277,11 @@ export const Sheet: React.FC<ISheetProps> = props => {
          */
         fireShowAnimFn.current = () => {
           // set sheet and mask visible
-          zIndex.setValue(DEFAULT_Z_INDEX + id)
-          opacity.setValue(1)
-          maskZIndex.setValue(DEFAULT_Z_INDEX + id)
+          zIndex.value = DEFAULT_Z_INDEX + id
+          opacity.value = 1
+          maskZIndex.value = DEFAULT_Z_INDEX + id
           startAnim(maskOpacity, 1, options)
-          top.setValue(startY)
+          top.value = startY
           startAnim(top, endY, options)
         }
         if (_type !== 'Expandable') {
@@ -300,10 +306,12 @@ export const Sheet: React.FC<ISheetProps> = props => {
         Math.abs(height - layoutHeight.current) > 1
       ) {
         const endY = HEIGHT - height - options.bottomOffset
-        top.setValue(endY)
+        top.value = endY
         layoutHeight.current = height
       }
     },
+    // rest all all anim refs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [_type, options, id, onEvent],
   )
 
@@ -330,6 +338,7 @@ export const Sheet: React.FC<ISheetProps> = props => {
   getInstance?.({
     close,
     expand,
+    options,
   })
 
   useEffect(() => {

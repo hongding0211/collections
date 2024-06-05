@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "rn-playground": "pnpm run -filter @hong97/collections-react-native-playground start",
-    "build-all": "pnpm run --filter @hong97/collections-* build",
+    "start:rn-playground": "pnpm run -filter @hong97/collections-react-native-playground start",
+    "build:all": "pnpm run --filter @hong97/collections-* build",
+    "changeset": "changeset",
     "prepare": "husky"
   },
   "keywords": [],

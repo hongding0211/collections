@@ -1,22 +1,18 @@
 import React from 'react'
 
-import { AnimationOptions } from '../../../utils'
-
-export interface PortalOptions extends AnimationOptions {}
-
-export interface IPortalInstance {
-  close: () => Promise<any>
-}
+export interface IPortalInstance {}
 
 export interface IPortalContext {
-  appendInstance: (
-    renderFn: React.FC<{ id: number }>,
-    options?: Partial<PortalOptions>,
-  ) => number
+  appendInstance: (renderFn: React.FC<{ id: number }>) => number
   dropInstance: (id: number) => void
   dropAllInstances: () => void
-  getInstance: (id: number) => IPortalInstance | undefined
-  setInstance: (id: number, instance: IPortalInstance) => void
+  getInstance: <T extends IPortalInstance = IPortalInstance>(
+    id: number,
+  ) => T | undefined
+  setInstance: <T extends IPortalInstance = IPortalInstance>(
+    id: number,
+    instance: T,
+  ) => void
 }
 
 export interface IPortalProviderProps {

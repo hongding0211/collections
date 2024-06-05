@@ -2,9 +2,10 @@ import { ContextEventsValue } from '@hong97/collections-react'
 import React from 'react'
 import { ScrollViewProps } from 'react-native'
 
-import { IPortalInstance, PortalOptions } from '../../core'
+import { AnimationOptions } from '../../../utils'
+import { IPortalInstance } from '../../core'
 
-export interface SheetOptions extends PortalOptions {
+export interface SheetOptions extends AnimationOptions {
   type: 'Hug' | 'Segment' | 'Expandable'
   maxHeight: number
   segmentHeightList?: number[]
@@ -19,12 +20,14 @@ export interface SheetOptions extends PortalOptions {
 
 export type UseSheet = {
   show: (renderFn: React.FC, options?: Partial<SheetOptions>) => number
-  destroy: (id: number) => void
+  close: (id: number) => void
   getInstance: (id: number) => ISheetInstance | undefined
 }
 
 export interface ISheetInstance extends IPortalInstance {
+  close: () => Promise<any>
   expand: () => void
+  options: SheetOptions
 }
 
 export interface ISheetProps {

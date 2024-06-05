@@ -17,7 +17,8 @@
   "peerDependencies": {
     "react": "*",
     "react-native": "*",
-    "react-native-gesture-handler": "*"
+    "react-native-gesture-handler": "*",
+    "react-native-reanimated": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
