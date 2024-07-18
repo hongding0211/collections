@@ -5,6 +5,7 @@ import React from 'react'
 
 import { KeyboardAvoidingScrollViewPage } from './pages/keyboard-avoiding-scroll-view'
 import { Sheet } from './pages/sheet'
+import { StackedFlashListPage } from './pages/stacked-flash-list'
 
 const Drawer = createDrawerNavigator()
 
@@ -13,6 +14,7 @@ export default function App() {
     <PortalProvider>
       <NavigationContainer>
         <Drawer.Navigator>
+          <Drawer.Screen name="StackedFlashList" component={StackedFlashListPage} />
           <Drawer.Screen name="Sheet" component={Sheet} />
           <Drawer.Screen
             name="KeyboardAvoidingScrollViewPage"

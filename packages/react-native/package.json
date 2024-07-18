@@ -18,7 +18,8 @@
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "@shopify/flash-list": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
